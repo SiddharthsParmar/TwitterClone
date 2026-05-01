@@ -1,0 +1,71 @@
+use twitter_clone_db1;
+select * from users_table;	
+-- THIS TABLE CONSISTS USER DATA ALONG WITH PROFILE IMAGE PATH AND COVER IMAGE PATH
+CREATE TABLE IF NOT EXISTS users_table(
+user_id bigint primary key auto_increment,
+firstname varchar(50) NOT NULL,
+lastname varchar(50) NOT NULL,
+username VARCHAR(100) NOT NULL UNIQUE,
+birth_date Date NOT NULL,
+joined_date Date NOT NULL,
+profile_image_path VARCHAR(255),
+cover_image_path VARCHAR(255),
+account_based_in VARCHAR(255) NOT NULL, 
+connected_via VARCHAR(255) NOT NULL
+); 
+create table tweets_table(
+tweet_original_id bigint primary key auto_increment,
+user_id bigint,
+tweet_content text not null,
+tweet_media text , 
+created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+FOREIGN KEY (user_id) REFERENCES users_table(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+DELETE  FROM tweets_table WHERE tweet_original_id BETWEEN 2 AND 12;			 
+DROP TABLE tweets_table;
+
+
+INSERT INTO  tweets_table(user_id , tweet_content , tweet_media) values(3,"As You Can see im  not dead" , "https://cdn.marvel.com/content/2x/007blp_ons_mas_mob_01_3.jpg");
+INSERT INTO  tweets_table(user_id , tweet_content , tweet_media) values(1,"this is my third tweet" , ""); 
+
+select * from tweets_table where user_id = 1;	
+
+CREATE TABLE likes_table(
+like_id bigint primary key auto_increment,
+user_id bigint,
+tweet_original_id bigint,
+FOREIGN KEY (tweet_original_id) REFERENCES tweets_table(tweet_original_id) ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (user_id) REFERENCES users_table(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+ALTER TABLE likes_table
+ADD CONSTRAINT unique_like UNIQUE (user_id, tweet_original_id);
+select * from likes_table;	
+drop table likes_table;
+
+
+CREATE TABLE IF NOT EXISTS follows_table(
+relation_id bigint primary key auto_increment,
+follower_id bigint,
+followee_id bigint,
+created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+FOREIGN KEY (follower_id) REFERENCES users_table(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (followee_id) REFERENCES users_table(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+CONSTRAINT UNIQUE(follower_id , followee_id)
+);
+
+SELECT * FROM follows_table;
+drop table follows_table;
+
+
+CREATE TABLE comments_table (
+comment_id bigint primary key auto_increment,
+user_id bigint not null,
+tweet_id bigint not null,
+comment_content text not null,
+parent_id bigint default null,
+FOREIGN KEY (user_id) references users_table(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (tweet_id) references tweets_table(tweet_original_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+select * from comments_table;
+drop table comments_table;
+select * from users_table where user_id = 4;

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Search</title>
+    <style>
+        .main_container {
+            height: 100vh;
+            background: #000;
+        }
+        .search_container {
+            height: 5vh;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            gap: 10px;
+        }
+        .list_container {
+            background: rgb(0, 0, 0);
+            height: 95vh;
+            overflow-y: auto;
+            padding: 10px;
+            color: #fff;
+        }
+        .error-message {
+            color: #ff4d4d;
+            border: 1px solid #ff4d4d;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            background: #2a0a0a;
+        }
+        .success-message {
+            color: #4dff4d;
+            border: 1px solid #4dff4d;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            background: #0a2a0a;
+        }
+        /* Style for the list items if you add them later */
+        .user-item {
+            margin: 5px 0;
+            color: #6e6e6e;
+            background: white;
+            height: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0px 20px;
+            
+        }
+        
+    </style>
+</head>
+
+<body>
+    <div class="main_container">
+        <div class="search_container">
+            <a href="/api/v1/users/home">back</a>
+            <label for="search_input">Search</label>
+            <input type="text" id="search_input" placeholder="Type to search...">
+        </div>
+        <div class="list_container" id="list_container">
+            <!-- Results will appear here -->
+             <div class="userDiv">
+
+             </div>
+        </div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById("search_input");
+        const listContainer = document.getElementById("list_container");
+
+        const searchHandler = async (e) => {
+            // Prevent default if needed, though 'change' event doesn't submit form
+            e.preventDefault();
+
+            const searchQuery = e.target.value.trim();
+
+            // Clear previous results and errors before new search
+            listContainer.innerHTML = "";
+
+            if (!searchQuery) {
+                // Optional: Show a message if search is empty
+                listContainer.innerHTML = "<p style='color: #666; text-align: center;'>Enter a search term...</p>";
+                return;
+            }
+
+            try {
+                // Fetch data
+                const response = await fetch(`http://localhost:8080/api/v1/users/search?search=${encodeURIComponent(searchQuery)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                // Check for HTTP errors (400, 500, etc.)
+                if (!response.ok) {
+                    let errorMessage = `Server Error: ${response.status} ${response.statusText}`;
+                    
+                    // Try to get the error message from the JSON body if available
+                    try {
+                        const errorData = await response.json();
+                        if (errorData.error) {
+                            errorMessage = errorData.error;
+                        }
+                    } catch (jsonError) {
+                        // If the body isn't JSON, stick with the status text
+                        console.error("Could not parse error response body");
+                    }
+
+                    throw new Error(errorMessage);
+                }
+
+                // Parse JSON data
+                const GotData = await response.json();
+                
+                // Clear errors if search succeeded
+                listContainer.innerHTML = "";
+
+                if (GotData.data && GotData.data.length > 0) {
+                    // Render success
+                    listContainer.innerHTML = "<div class='success-message'>Found " + GotData.data.length + " results:</div>";
+                    
+                    // Example: Render the data (adjust based on your actual data structure)
+                    GotData.data.forEach(user => {
+                        const userDiv = document.createElement("div");
+
+
+                        userDiv.className = "user-item";
+                        userDiv.textContent = `User: ${user.username || 'N/A'} | Email: ${user.email || 'N/A'}`;
+                        userDiv.addEventListener("click",()=>{
+                            window.location.href = `http://localhost:8080/api/v1/users/singleuser?username=${user.username}`
+                        })
+                        listContainer.appendChild(userDiv);
+                    });
+                } else {
+                    // No results found
+                    listContainer.innerHTML = "<p style='color: #666;'>No users found matching your search.</p>";
+                }
+
+            } catch (error) {
+                // Handle network errors or custom errors
+                console.error("Search error:", error);
+                
+                const errorDiv = document.createElement("div");
+                errorDiv.className = "error-message";
+                errorDiv.textContent = `Error: ${error.message}`;
+                listContainer.appendChild(errorDiv);
+            }
+        };
+
+        // Event Listeners
+        // Use 'input' instead of 'change' for real-time feedback as the user types
+        searchInput.addEventListener("input", (e) => {
+            // Optional: Debounce could be added here to reduce API calls
+            searchHandler(e);
+        });
+
+        // Also allow pressing "Enter" key
+        searchInput.addEventListener("keydown", (e) => {
+            if (e.key === 'Enter') {
+                searchHandler(e);
+            }
+        });
+    </script>
+</body>
+</html>

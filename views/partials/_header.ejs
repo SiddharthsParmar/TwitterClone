@@ -1,0 +1,38 @@
+<!-- views/partials/_header.ejs -->
+<div class="profile-header-wrapper">
+    <!-- Cover Image -->
+    <div class="cover_container" style="display: flex; justify-content: flex-start; align-items: flex-end; background: rgb(35, 193, 255); height: 20vh; overflow: hidden; position: relative;">
+        <div class="profile-image" style="border-radius: 50%; border: 5px solid #000; height: 75px; overflow: hidden; background: #ffffff; width: 75px; margin-bottom:-50px; margin-left: 20px; position: relative; z-index: 2;">
+            <img height="75px" width="75px" src="<%= user.profile_image_path ? user.profile_image_path : 'https://via.placeholder.com/75' %>" style="object-fit: cover;"/>
+        </div>
+    </div>
+
+    <!-- Info Section -->
+    <div class="information_container" style="color: rgb(153, 153, 153); background: rgb(0, 0, 0); padding: 0 20px 20px 20px;">
+        <div style="margin-top: 40px;">
+            <h1 style="color: white; margin: 0; font-size: 1.5rem;"><%= user.firstname %> <%= user.lastname %></h1>
+            <p style="margin: 5px 0; color: #888;">@<%= user.username %></p>
+            
+            <% if (user.bio) { %>
+                <p style="color: white; margin: 10px 0;"><%= user.bio %></p>
+            <% } %>
+
+            <div style="font-size: 12px; margin: 10px 0;">
+                Born <span style="color:white"><%= user.birth_date || 'N/A' %></span> • Joined March 2025
+            </div>
+
+            <div style="display: flex; gap: 20px; margin: 15px 0;">
+                <a href="/api/v1/users/following" style="color:white; text-decoration:none;"><span id="followingCount" style="font-weight:bold; color:white;">0</span> Following</a>
+                <a href="/api/v1/users/followers" style="color:white; text-decoration:none;"><span id="followerCount" style="font-weight:bold; color:white;">0</span> Followers</a>
+            </div>
+
+            <!-- Edit Profile Button (Triggers Modal) -->
+            <button id="edit_profile_trigger" style="background: transparent; border: 1px solid #555; color: white; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; margin-top: 10px;">
+                Edit Profile
+            </button>
+
+         
+        </div>
+    </div>
+    <hr style="border-color: #333; margin: 0;">
+</div>

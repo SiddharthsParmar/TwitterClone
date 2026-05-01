@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <title>Login</title>
+</head>
+<body>
+    
+<form enctype="application/x-www-form-urlencoded">
+<div class="center-aligner" style="background-color: black; height: 100vh; display: flex;justify-content: center; align-items: center;">
+
+    <div class="central_container" style="height: 70vh; width: 25vw; background: white; display: flex;justify-content: center; align-items: center; ">
+        
+        <div class="form_container" style="display: flex;align-items: center; justify-content: center ; flex-direction: column;  height: 40vh;width: 75%;gap:1rem; background: #ffffff;">
+            <form>
+            <div class="field_container" style="cursor: pointer;background: white; height: 30px; display: flex;padding: 5px 20px; border: 1px solid grey; border-radius: 5px;"> 
+                <input type="text" id="emailField" placeholder="Phone , email , or username" style="border: none; outline: none;">
+              
+            </div>
+            <div class="field_container"  style="cursor: pointer;background: white; height: 30px; margin-top:7px ; display: flex;padding: 5px 20px; border: 1px solid grey; border-radius: 5px;"> 
+                <input type="text" id="passwordField" placeholder="password" style="border: none; outline: none;">
+              
+            </div>
+             <div class="field_container" id="submitButton" style="cursor: pointer;background: rgb(0, 0, 0); color: white; display: flex; justify-content: center; align-items: center; height: 25px; width: 11rem; margin-top:7px ; display: flex;padding: 5px 20px; border: 1px solid grey; border-radius: 50px;"> 
+              
+                    Next
+            </div>
+    
+             <div class="field_container" id="forgotPassword" style=" cursor: pointer;;background: rgb(255, 255, 255); color: rgb(0, 0, 0); display: flex; justify-content: center; align-items: center; height: 25px; width: 11rem; margin-top:7px ; display: flex;padding: 5px 20px; border: 1px solid grey; border-radius: 50px;"> 
+              
+                    Forgot Password
+            </div>
+            
+            </form>
+            
+            <p style="color: grey; font-weight: 50;">Don't have account ? <a href="">sign up</a></p>
+        </div>
+    </div>
+
+</div>
+
+
+</form>
+ 
+
+
+
+</body>
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script> -->
+ <script>
+
+    const emailField = document.getElementById("emailField");
+    const passwordField = document.getElementById("passwordField");
+    const submitButtton = document.getElementById("submitButton") 
+    const forgotPasswordButton = document.getElementById("forgotPassword")
+
+    submitButtton.addEventListener("click",async(e)=>{
+        e.preventDefault();
+
+        // if(emailField.value ==="" || passwordField.value ===""){
+        //     alert("enter the details")
+        // }
+        const data = {
+            email:emailField.value,
+            password:passwordField.value
+        }
+
+        const response =await fetch("http://localhost:8080/api/v1/users/login",{
+            method:"POST",
+            body:JSON.stringify({email:emailField.value , password:passwordField.value}),
+            headers:{
+                "Content-Type":'application/json'
+            }
+        })
+        if(response.status == 200){
+            window.location.href = "http://localhost:8080/api/v1/users/home"
+        }
+        if(response.status==402){
+            alert("enter valid data")
+        }
+        if(response.status===422){
+            alert("user does not exists")
+        }
+        
+    })
+
+    forgotPasswordButton.addEventListener("click",(e)=>{
+        e.preventDefault();
+        alert("hkjefj")
+        window.location.href = `/api/v1/users/forgetPassword`
+
+
+    })
+
+
+ </script>
+
+</html>

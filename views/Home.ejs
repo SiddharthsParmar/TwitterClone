@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<style>
+body{
+    margin: 0;
+    padding: 0;
+}
+    .main-window{
+        height: 90vh;
+        background: #000000;
+        display: flex;
+        overflow: hidden;
+    }
+    .sidebar{
+        height: 100vh;
+        flex:1;
+        background: white;
+        border-right: .5px solid grey;
+    }
+    .main_container{
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+.header{
+    min-height: 5vh;
+    background: rgb(0, 0, 0);
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 10px;
+   
+}
+.profile_image{
+    height: 50px;
+    width: 50px;
+    background: white;
+    border-radius: 50%;
+    
+}
+
+.search_navigator{
+     height: 50px;
+    width: 50px;
+    background: white;
+    border-radius: 50%;
+}
+.sidebar{
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    height: 90vh;
+    flex: 1;
+}
+.navbar{
+    background: rgb(0, 0, 0);
+    width: 100%;
+    height: 90%;
+}
+.logout{
+    background: rgb(0, 0, 0);
+    width: 100%;
+    height: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: red;
+}
+
+.toggleBar{
+    display: none;
+}
+.profile_data{
+    background: rgb(0, 0, 0);
+    height: 10%;
+    padding: 0px 20px;
+}
+
+
+.Main_Hero_container{
+    flex: 10;
+}
+
+
+@media(max-width:800px){
+.sidebar{
+    display: none;
+}
+}
+
+
+.below_bar{
+  
+    display: none;
+   
+
+}
+
+@media(max-width:800px){
+.below_bar{
+      position:absolute;
+    display: flex;
+    justify-content: space-between;
+   height: 100px;
+    background: rgb(0, 0, 0);
+    width: 98vw;
+    margin-top: 90vh;
+    padding: 2px 5px;
+
+}
+}
+.suggestion_container{
+    flex:2;height: 90vh; background: #ececec;
+}
+
+@media(max-width:800px){
+.suggestion_container{
+    display: none;
+
+}
+}
+.tweet_aligner {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+  height: 100%;
+ 
+}
+@media(max-width:800px){
+.tweet_aligner {
+    -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+  height: 100%;
+   
+    padding: 0;
+    background: #ffffff;
+}
+
+}
+.hide_comments{
+    display: none;
+}
+
+.comment_container{
+    overflow-y:scroll;position: absolute; height: 80vh; width: 25vw; background: #020202e5; margin-left: 80%; padding: 10px 5px;
+    -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;
+  border: .5px solid grey;
+  border-radius: 5px    ;
+  padding: 2px 7px;
+}
+
+
+</style>
+
+
+<body>
+    <div class="main_container" >
+        <div class="header">
+          <div class="profile_image" id="profile_image" style=" background: white; ">
+                <img src="/uploads/<%=Userdata.profile_image_path%>" height="50rem" width="50rem" style="border-radius: 50%;">
+            </div>
+          
+             <div class="" style="height: 10px ; width: 10px; background: white;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/X_logo.jpg/1280px-X_logo.jpg" height="50rem" width="50rem">
+            </div>
+              <div class="search_navigator" id="search_navigator" style="display: flex;justify-content: center; align-items: center;"><img src="https://cdn-icons-png.flaticon.com/128/151/151773.png" height="10px"></div>
+        </div>
+<div class="main-window" >
+
+    <div class="sidebar togglerBar" id="sidebar" >
+        <div class="profile_data" >
+            <a href="/api/v1/users/profile" style="text-decoration: none; color: rgb(255, 255, 255);">
+            <h3><%=Userdata.firstname%></h3>
+            <p style="font-size: small;">@<%=Userdata.username%></p>
+            
+        </div>
+        </a>
+        <div class="navbar" style="color: white;display: flex;flex-direction: column ; justify-content: space-between; align-items: center;">     
+            <a href="" >Home</a>
+            <a href="">profiles</a>
+        </div>
+        <div class="logout" >
+            <div class="" style="color: rgba(0, 0, 0, 0.744); background: #ff7272; padding: 20px 50px; border-radius: 10px;"  id="logout-btn">
+            Logout
+            </div>
+        </div>
+    </div>
+    <div class="Main_Hero_container" style="display: flex; align-items: center; justify-content: center; ">
+        <div class="tweet_aligner" id="tweet_aligner" style="height: 100%; background:rgb(0, 0, 0); width: 40vw; padding: 10px 50px; overflow: scroll; border: .5px solid grey;">
+
+<% if (feed && feed.length > 0) { %>
+  <% feed.forEach((item, index) => { %>
+    <!-- Your HTML content here. 
+         Access item properties like item.name, item.id, etc. -->
+    
+    <div class="item-card">
+      <h3><%= item.title %></h3>
+      <p><%= item.content %></p>
+      
+      <!-- Example: If you want to include a partial inside the loop -->
+      <%- include('partials/_feed', { feed: item }) %>
+
+<!-- CONTROLS WITH DATA ATTRIBUTES --> 
+ <div class="tweet_controls" style="display: flex; justify-content: space-around; align-items: center; margin-top: 10px; position: relative;"> <!-- Like Button --> <!-- Pass current user ID and tweet ID as data attributes --> 
+    <button class="icon-btn like-btn" style="background: none; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; color: #888;"
+     data-tweet-id="<%=item.tweet_original_id%>" data-user-id="<%=item.user_id %>"> 
+    <span style="font-size: 20px;">❤️</span> 
+    <span class="like-count" style="font-size: 12px; margin-top: 2px;">0</span> 
+</button> <!-- Comment Button (Triggers comment section) --> 
+<button class="comment_btn1 icon-btn " onclick="commentHandler('<%=item.tweet_original_id%>')"   style="background: none; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; color: #888;" data-tweet-id="<%=item.tweet_original_id%>">
+     <span style="font-size: 20px;">💬</span> <span style="font-size: 12px; margin-top: 2px;">Comment</span> 
+    </button> <!-- Retweet Button -->
+     <button class="icon-btn retweet-btn" style="background: none; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; color: #888;" data-tweet-id="<%=item.tweet_original_id%>" data-user-id="<%=item.user_id %>"> 
+        <span style="font-size: 20px;">🔄</span> <span style="font-size: 12px; margin-top: 2px;">Retweet</span> 
+    </button> 
+<button class="icon-btn delete-btn" style="background: none; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; color: #888;" data-tweet-id="<%=item.tweet_original_id%>" data-user-id="<%=item.user_id %>"> 
+        <span style="font-size: 20px;">⃠</span> <span style="font-size: 12px; margin-top: 2px;">Delete</span> 
+    </button>
+
+</div>
+
+<!-- HIDDEN COMMENTS SECTION (Initially hidden) -->
+     <div class="comments-section"  style=" width: 100%; background: #111; padding: 10px; margin-top: 10px; border-radius: 8px;">
+         <p style="color: #888; font-size: 12px;">Comments for this tweet...</p> 
+         <form action="/api/v1/users/submit_comment" enctype="application/x-www-form-urlencoded" method="POST">
+         <input type="text" name="comment_content" placeholder="Write a comment..." style="width: 80%; padding: 5px; background: #333; border: none; color: white; border-radius: 4px;">
+         <input type="hidden" name="tweet_id" value="<%=item.tweet_original_id%>">
+         <input type="hidden" name="user_id" value="<%=item.user_id%>">
+          <input type="submit" style="padding: 5px 10px; background: white; color: black; border: none; border-radius: 4px; cursor: pointer;" value="comment">Post</button> 
+        </form>
+        </div>
+    </div>
+
+  <% }); %>
+<% } else { %>
+  <p>No items found.</p>
+<% } %>
+
+
+
+</div>
+
+            <div class="comment_container  " id="comment_container">
+               
+
+
+
+            </div>
+            <!-- <div class="item_tweets_container" style="min-height: 90vh; max-height: 90vh; padding:50px; overflow-y: scroll; background:white; margin: 0% 10%; display: flex; align-items: center; justify-content: space-between; flex-direction: column;">
+
+                    <div class="tweet" style="height: 20rem; width: 50rem; background: rgb(192, 192, 192);"></div>
+                    <div class="tweet" style="height: 20rem; width: 50rem; background: rgb(192, 192, 192);"></div>
+                    <div class="tweet" style="height: 20rem; width: 50rem; background: rgb(192, 192, 192);"></div>
+
+
+
+
+
+
+
+
+            </div>
+    -->
+
+
+    </div>
+
+    <div class="suggestion_container">
+        
+
+        <div class="follower_card" style="height: 50px; background: #000; width: 100%; margin: 2px;">
+            
+
+
+        </div>
+
+
+
+    </div>
+
+
+
+
+
+</div>
+
+
+<div class="below_bar">
+<div class="navs" style="background: #000; height: 75%; width: 100%; display: flex;justify-content: space-between; align-items: center; padding: 0px 10px;">
+    <div class="" style="height: 20px; width: 20px; background: white;"></div>
+      <div class="" style="height: 20px; width: 20px; background: white;"></div>
+        <div class="" style="height: 20px; width: 20px; background: white;"></div>
+        
+    </div>
+</div>
+
+
+</div>
+
+<script>
+
+ 
+
+async function commentHandler(tweet_id){
+
+    const comment_container =document.getElementById("comment_container")
+    const h1 = document.createElement("h1");
+    comment_container.classList.toggle("hide_comments")
+    comment_container.innerHTML = "<h1 style='color:white'>Comments</h1>"
+    
+    h1.textContent = tweet_id;
+    comment_container.appendChild(h1);
+
+    const response = await fetch(`http://localhost:8080/api/v1/users/getTweetComments?tweet_id=${tweet_id}`,{
+        method:'get'
+    })
+    const data = await response.json()
+    console.log(data);
+    
+    
+
+ data.data.forEach((item,index)=>{
+
+    console.log(item.comment_id);
+
+const comment_card = document.createElement("div");
+comment_card.innerHTML = `
+                <div class="comment_card" style="height: 50px; background: black; border:.5px solid grey   ;">
+                    <div class="comment_card_user">
+                        <p style="color:white">${item.user_id}</p>
+                    </div>
+
+                </div>
+                <div class="comment_content" style="background: black; margin-top:2px;color:white; padding: 10px 5px; border: .5px solid grey;">
+                    <p>${item.comment_content}</p>
+                   
+                </div>
+                
+                <div class="comments-section "  style="  width: 100%;  background: #111; padding: 10px; margin-top: 10px; border-radius: 8px;">
+         <p style="color: #888; font-size: 12px;">Comments for this tweet...</p> 
+         <form action="/api/v1/users/submit_comment" enctype="application/x-www-form-urlencoded" method="POST">
+            <input type="text" name="comment_content" placeholder="Write a Reply..." style="width: 80%; padding: 5px; background: #333; border: none; color: white; border-radius: 4px;">
+            <input type="hidden" name="tweet_id" value=${item.tweet_id}>
+            <input type="hidden" name="user_id" value=${item.user_id}>
+            <input type="hidden" name="parent_id" value=${item.tweet_id}>
+            <input type="submit" style="padding: 5px 10px; background: white; color: black; border: none; border-radius: 4px; cursor: pointer;" value="comment">
+            </form>
+            
+            </div>
+    </div>
+           
+        `
+
+
+    comment_container.appendChild(comment_card) 
+                
+    
+})
+        
+
+
+
+}
+
+  // Wait for DOM to load
+    document.addEventListener('DOMContentLoaded', () => {
+       
+
+        // --- 1. LIKE FUNCTIONALITY ---
+        document.querySelectorAll('.like-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const tweetId = this.getAttribute('data-tweet-id');
+                const userId = this.getAttribute('data-user-id');
+                const icon = this.querySelector('span:first-child');
+                const countSpan = this.querySelector('.like-count');
+                
+                // Optimistic UI update (turn red immediately)
+                const isLiked = icon.style.color === 'red';
+                
+                if (!isLiked) {
+                    icon.style.color = 'red';
+                    // Increment local count
+                    let currentCount = parseInt(countSpan.innerText);
+                    countSpan.innerText = currentCount + 1;
+                } else {
+                    icon.style.color = '#888';
+                    let currentCount = parseInt(countSpan.innerText);
+                    countSpan.innerText = currentCount - 1;
+                }
+
+                // Send API Request
+                try {
+                    const response = await fetch('http://localhost:8080/api/v1/users/like', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tweetId, userId })
+                    });
+
+                    if (!response.ok) {
+                        // Revert UI if API fails
+                        throw new Error('API Error');
+                    }
+                    const result = await response.json();
+                    // Update count with actual server count if needed
+                    // countSpan.innerText = result.count; 
+                } catch (error) {
+                    console.error('Like failed:', error);
+                    // Revert UI on error
+                    icon.style.color = isLiked ? 'red' : '#888';
+                }
+            });
+        });
+
+
+
+        // --- 2. COMMENT FUNCTIONALITY (Extend Div) ---
+        // document.querySelectorAll('.comment-btn').forEach(btn => {
+        //     btn.addEventListener('click', function() {
+        //         const tweetId = this.getAttribute('data-tweet-id');
+        //         // Find the sibling comments-section div
+        //         const commentsDiv = this.closest('.single_tweet').querySelector('.comments-section');
+        //         console.log("commment");
+                
+        //         if (commentsDiv.style.display === 'none' || commentsDiv.style.display === '') {
+        //             commentsDiv.style.display = 'block';
+        //             // Optional: Scroll into view
+        //             commentsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        //         } else {
+        //             commentsDiv.style.display = 'block';
+        //         }
+        //     });
+        // });
+
+        // --- 3. RETWEET FUNCTIONALITY ---
+        document.querySelectorAll('.retweet-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const tweetId = this.getAttribute('data-tweet-id');
+                const userId = this.getAttribute('data-user-id');
+                const icon = this.querySelector('span:first-child');
+
+                // Visual feedback
+                const originalText = icon.innerText;
+                icon.innerText = '⏳'; // Loading state
+
+                try {
+                    const response = await fetch('/api/tweets/retweet', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tweetId, userId })
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            icon.innerText = '✅'; // Success state
+                            setTimeout(() => icon.innerText = originalText, 2000);
+                            alert('Retweeted successfully!');
+                        }
+                    } else {
+                        const errorData = await response.json();
+                        alert('Retweet failed: ' + (errorData.message || 'Unknown error'));
+                        icon.innerText = originalText;
+                    }
+                } catch (error) {
+                    console.error('Retweet error:', error);
+                    alert('Network error. Please try again.');
+                    icon.innerText = originalText;
+                     
+                }
+            });
+        });
+       document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", async function () {
+        const tweetId = this.getAttribute("data-tweet-id");
+        const userId = this.getAttribute("data-user-id");
+        const icon = this.querySelector('span:first-child');
+        const originalText = icon.innerText;
+
+        // Set loading state
+        icon.innerText = "⏳";
+
+        try {
+            // FIX 1: Await the fetch call here
+            const response = await fetch("/api/v1/users/delete", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tweetId, userId })
+            });
+
+            // FIX 2: Now 'response' is the actual object, so .ok works
+            if (response.ok) {
+                const result = await response.json();
+                
+                if (result.success) {
+                    icon.innerText = '✅';
+                    // FIX 3: Corrected the alert message
+                    alert('Tweet deleted successfully!'); 
+                    
+                    // Optional: Remove the element from DOM instead of just showing an alert
+                    // this.closest('.tweet-container').remove(); 
+                    
+                    setTimeout(() => icon.innerText = originalText, 2000);
+                } else {
+                    // Handle server-side failure (e.g., not authorized)
+                    alert('Delete failed: ' + (result.message || 'Unknown error'));
+                    icon.innerText = originalText;
+                }
+            } else {
+                // Handle HTTP errors (4xx, 5xx)
+                let errorData = {};
+                try {
+                    errorData = await response.json();
+                } catch (e) {
+                    // Fallback if server returns non-JSON error
+                    errorData = { message: "Server returned an error" };
+                }
+                alert('Delete failed: ' + (errorData.message || 'Unknown error'));
+                icon.innerText = originalText;
+            }
+
+        } catch (error) {
+            // This catches network failures (no internet, server down, CORS)
+            console.error('Delete error:', error);
+            alert('Network error. Please try again.');
+            icon.innerText = originalText;
+        }
+    });
+});
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// navbar toggler
+const NavToggler = document.getElementById("profile_image")
+const sidebar = document.getElementById("sidebar")
+NavToggler.addEventListener("click",()=>{
+  
+    sidebar.classList.toggle("toggleBar")
+})
+
+// search navigation
+
+const searchNav = document.getElementById("search_navigator");
+
+searchNav.addEventListener("click",()=>{
+
+window.location.href = `http://localhost:8080/api/v1/users/searchPage`
+
+})
+
+
+// const fetchUserData = async()=>{
+
+
+// const response  = await fetch(`http://localhost:8080/api/v1/users/home`,{
+//     method:'get'
+// });
+
+// if(response.status!==200){
+//     alert("something went wrong")
+
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// to fetch the feed data
+
+
+// const fetchfeed = async()=>{
+// const tweet_container = document.getElementById("tweet_aligner")
+
+// const response = await fetch("http://localhost:8080/api/v1/users/feed",{
+//     method:'GET',
+    
+// })
+// if(response.status==200){
+//     const data = await response.json();
+//     console.log(data);
+//     data.forEach((data)=>{
+
+//      
+
+
+
+//     })
+    
+// }
+
+
+
+
+
+// }
+
+
+
+
+
+
+
+// fetchfeed()
+
+
+
+
+
+</script>
+
+
+
+</body>
+    
+
+
+</html>

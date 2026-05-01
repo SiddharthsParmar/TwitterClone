@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+
+<div class="main-container" style=" display: flex; justify-content: space-between; flex-direction: column; height: 100vh;background: #000;">
+    <div class="invisible_absolute_container" style="position:absolute; z-index: 999; height: 100vh;width: 100vw; display: flex; justify-content: center; align-items: center; ">
+    <div class="pop_up" id="pop_up" style="position:relative; height: 20em; width: 25em; background: white; display: flex;flex-direction: column; align-items: center   ;">
+        <div onclick="toggler()" class="back_btn" style=" position: relative;height: 2em; background: #ffffff ; padding: 0px 5px;">
+            X
+        </div>
+        <div class="file_uploader" style=" height: 20vh; display: flex;justify-content: space-between; flex-direction: column;">
+        <form>
+            <span>cover</span>
+            <input type="File">
+            
+            <input type="submit">
+        </form>
+
+         <form>
+            <span>Profile</span>
+            <input type="File">
+            <input type="submit">
+        </form>
+        </div>
+    </div>
+</div>
+    <div class="aligner">
+        <div class=""  style="position: absolute; height: 50px; width: 50px; background: red; border-radius: 50%; margin:5px ;" ></div>
+        <div class="cover_container" onclick="UploadCoverImageHandler()" style="display: flex; justify-content: flex-start; align-items: flex-end; background: rgb(35, 193, 255); height: 20vh; " >
+            <div  onclick="UploadCoverImageHandler()" class="profile-image" style="border-radius: 50%; border: 5px solid ; height: 75px; overflow: hidden;  background: #ffffff; width: 75px; margin-bottom:-50px ; margin-left: 20px; ">
+               
+
+
+    <img  height="75px" width="75px" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnkcqkUHsDulyGaMQk4mV7s9_d8-FW0x8ZOQ&s"/>
+
+
+
+            
+            </div>
+        </div>
+
+        <div class="information_container" style="color: rgb(153, 153, 153); height: 30vh; background: rgb(0, 0, 0); padding: 30px 10px;">
+            <div class="fullname"><h1></h1>
+            <p></p>
+            </div>
+            <div class="fullname">
+            <p>Born
+            Joined March 2025 </p>
+            <p><span>5 Following </span><span>0 Followers</span></p>
+            </div>
+            
+        </div>  
+        
+        <div class="tweet_container" style="background: rgb(75, 75, 75) ; height: 50vh;">
+
+        </div>
+
+    </div>
+
+
+
+</div>
+<script>
+
+const popUp = document.getElementById("pop_up")
+const toggler = ()=>{
+    popUp.style.display = "none"
+
+
+}
+
+// const invisible_absolute_container = document.getElementById
+
+// const UploadCoverImageHandler = (e)=>{
+//     console.log(e.target);
+// }
+
+
+</script>
+    
+</body>
+</html>

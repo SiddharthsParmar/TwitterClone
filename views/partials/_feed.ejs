@@ -1,0 +1,277 @@
+
+
+<style>
+    .single_tweet_com{
+        height: auto;
+      
+        background: rgb(15, 15, 15);
+        display: flex;
+        flex-direction: column;
+        border: 0.5px solid grey;
+        margin-bottom: 10px;
+        border-radius: 10px;
+       
+    }
+    .profile__tweet_data{
+        height: 60px;
+        display: flex;
+        align-items: center;
+        background: #000000;
+        padding: 0px 5px;
+        justify-content: space-between;
+        border-bottom: .5px solid grey;
+        /* border-radius: 10px; */
+        
+
+    }
+    .profile_image_com{
+        height: 50px;
+        width: 50px;
+        background: #ffffff;
+        border-radius: 50%;
+        
+    }
+    .profile_info{
+        color: white;
+       flex: 10;
+        padding-left: 10px;
+    }
+    .time{
+        padding-right: 10px;
+        color: white;
+    }
+    .follow{
+        flex: 2;
+        background: #ffffff;
+        border-radius: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .media_container{
+        min-height: 500px;
+        margin-left: 20%;
+        border: .5px solid grey;
+        border-radius: 10px;
+        width: 70%;
+    }
+    .tweet_data {
+        padding: 20px;
+    }
+    .tweet_content{
+        color: white;
+        margin-left: 20%;
+    }
+
+
+
+</style>
+
+
+
+<div class="single_tweet_com" >
+    <div class="profile__tweet_data">
+    <a href="/api/v1/users/singleuser?username=<%=feed.username%>">
+        <div class="profile_image_com" id="profile_image_com" style="background: url('/uploads/<%=feed.profile_image_path%>');height: 50px;width: 50px; border-radius: 50%; ">
+<img src="/uploads/<%=feed.profile_image_path%>" style="border-radius: 50%;" height="50px" width="50px" >   
+        </div>
+        </a>    
+        <div class="profile_info">
+            
+           <p><%=feed.username%></p>
+
+        </div>
+        <div class="time">
+            <p>19 hours ago</p>
+
+        </div>
+        <div class="follow">
+            <p>follow</p>
+
+        </div>
+
+
+    </div>
+    
+
+
+<div class="tweet_data">
+    <div class="tweet_content">
+            <p><%= feed.tweet_content%></p>
+    </div>
+    <div class="media_container" style="background: url('/uploads/<%=feed.tweet_media%>'); object-fit: contain; background-size: cover; ">
+
+<!-- <img src="/uploads/<%= feed.tweet_media %>" style="width:50%; margin-top:10px;"> -->
+    </div>
+
+</div>
+
+</div>
+<script>
+
+
+   // Wait for DOM to load
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        // --- 1. LIKE FUNCTIONALITY ---
+        document.querySelectorAll('.like-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const tweetId = this.getAttribute('data-tweet-id');
+                const userId = this.getAttribute('data-user-id');
+                const icon = this.querySelector('span:first-child');
+                const countSpan = this.querySelector('.like-count');
+                
+                // Optimistic UI update (turn red immediately)
+                const isLiked = icon.style.color === 'red';
+                
+                if (!isLiked) {
+                    icon.style.color = 'red';
+                    // Increment local count
+                    let currentCount = parseInt(countSpan.innerText);
+                    countSpan.innerText = currentCount + 1;
+                } else {
+                    icon.style.color = '#888';
+                    let currentCount = parseInt(countSpan.innerText);
+                    countSpan.innerText = currentCount - 1;
+                }
+
+                // Send API Request
+                try {
+                    const response = await fetch('http://localhost:8080/api/v1/users/like', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tweetId, userId })
+                    });
+
+                    if (!response.ok) {
+                        // Revert UI if API fails
+                        throw new Error('API Error');
+                    }
+                    const result = await response.json();
+                    // Update count with actual server count if needed
+                    // countSpan.innerText = result.count; 
+                } catch (error) {
+                    console.error('Like failed:', error);
+                    // Revert UI on error
+                    icon.style.color = isLiked ? 'red' : '#888';
+                }
+            });
+        });
+
+        // --- 2. COMMENT FUNCTIONALITY (Extend Div) ---
+        document.querySelectorAll('.comment-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tweetId = this.getAttribute('data-tweet-id');
+                // Find the sibling comments-section div
+                const commentsDiv = this.closest('.single_tweet').querySelector('.comments-section');
+                
+                if (commentsDiv.style.display === 'none' || commentsDiv.style.display === '') {
+                    commentsDiv.style.display = 'block';
+                    // Optional: Scroll into view
+                    commentsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    commentsDiv.style.display = 'none';
+                }
+            });
+        });
+
+        // --- 3. RETWEET FUNCTIONALITY ---
+        document.querySelectorAll('.retweet-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const tweetId = this.getAttribute('data-tweet-id');
+                const userId = this.getAttribute('data-user-id');
+                const icon = this.querySelector('span:first-child');
+
+                // Visual feedback
+                const originalText = icon.innerText;
+                icon.innerText = '⏳'; // Loading state
+
+                try {
+                    const response = await fetch('/api/tweets/retweet', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tweetId, userId })
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            icon.innerText = '✅'; // Success state
+                            setTimeout(() => icon.innerText = originalText, 2000);
+                            alert('Retweeted successfully!');
+                        }
+                    } else {
+                        const errorData = await response.json();
+                        alert('Retweet failed: ' + (errorData.message || 'Unknown error'));
+                        icon.innerText = originalText;
+                    }
+                } catch (error) {
+                    console.error('Retweet error:', error);
+                    alert('Network error. Please try again.');
+                    icon.innerText = originalText;
+                     
+                }
+            });
+        });
+       document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", async function () {
+        const tweetId = this.getAttribute("data-tweet-id");
+        const userId = this.getAttribute("data-user-id");
+        const icon = this.querySelector('span:first-child');
+        const originalText = icon.innerText;
+
+        // Set loading state
+        icon.innerText = "⏳";
+
+        try {
+            // FIX 1: Await the fetch call here
+            const response = await fetch("/api/v1/users/delete", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tweetId, userId })
+            });
+
+            // FIX 2: Now 'response' is the actual object, so .ok works
+            if (response.ok) {
+                const result = await response.json();
+                
+                if (result.success) {
+                    icon.innerText = '✅';
+                    // FIX 3: Corrected the alert message
+                    alert('Tweet deleted successfully!'); 
+                    
+                    // Optional: Remove the element from DOM instead of just showing an alert
+                    // this.closest('.tweet-container').remove(); 
+                    
+                    setTimeout(() => icon.innerText = originalText, 2000);
+                } else {
+                    // Handle server-side failure (e.g., not authorized)
+                    alert('Delete failed: ' + (result.message || 'Unknown error'));
+                    icon.innerText = originalText;
+                }
+            } else {
+                // Handle HTTP errors (4xx, 5xx)
+                let errorData = {};
+                try {
+                    errorData = await response.json();
+                } catch (e) {
+                    // Fallback if server returns non-JSON error
+                    errorData = { message: "Server returned an error" };
+                }
+                alert('Delete failed: ' + (errorData.message || 'Unknown error'));
+                icon.innerText = originalText;
+            }
+
+        } catch (error) {
+            // This catches network failures (no internet, server down, CORS)
+            console.error('Delete error:', error);
+            alert('Network error. Please try again.');
+            icon.innerText = originalText;
+        }
+    });
+});
+    });
+
+
+</script>

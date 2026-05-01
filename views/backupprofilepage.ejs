@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile</title>
+
+<style>
+/* ---------------- GLOBAL ---------------- */
+body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    background:#000;
+}
+
+.main-container{
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+}
+
+/* ---------------- PROFILE HEADER ---------------- */
+.cover_container{
+    position:relative;
+    height:200px;
+    background:#23c1ff;
+}
+
+.profile-image{
+    position:absolute;
+    bottom:-40px;
+    left:20px;
+    height:80px;
+    width:80px;
+    border-radius:50%;
+    border:4px solid black;
+    overflow:hidden;
+    background:#fff;
+}
+
+.information_container{
+    padding:60px 15px 15px;
+    color:#999;
+}
+
+.fullname h1{
+    color:white;
+    margin:0;
+}
+
+/* ---------------- BUTTON ---------------- */
+.edit-btn{
+    position:absolute;
+    right:20px;
+    bottom:-20px;
+    padding:8px 16px;
+    border-radius:20px;
+    border:1px solid #555;
+    background:#000;
+    color:white;
+    cursor:pointer;
+}
+
+/* ---------------- MODAL ---------------- */
+.modal{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.7);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:1000;
+}
+
+.modal-content{
+    width:90%;
+    max-width:500px;
+    background:#fff;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.modal-header{
+    display:flex;
+    justify-content:space-between;
+    padding:10px;
+}
+
+.cover-preview{
+    height:150px;
+    background:#ccc;
+    position:relative;
+}
+
+.profile-preview{
+    position:absolute;
+    bottom:-40px;
+    left:20px;
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    border:4px solid white;
+    overflow:hidden;
+}
+
+.modal-body{
+    padding:60px 15px 15px;
+}
+
+.modal-body input, .modal-body textarea{
+    width:100%;
+    padding:10px;
+    margin-bottom:10px;
+    border-radius:5px;
+    border:1px solid #ccc;
+}
+
+/* ---------------- TWEETS ---------------- */
+.single_tweet{
+    width:95%;
+    max-width:400px;
+}
+
+/* ---------------- MOBILE ---------------- */
+@media(max-width:600px){
+    .profile-image{
+        height:60px;
+        width:60px;
+    }
+    .edit-btn{
+        font-size:12px;
+        padding:6px 10px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="main-container">
+
+<!-- ================= HEADER ================= -->
+<div class="cover_container">
+
+    <img id="coverImage"
+         src="<%=profileData.cover_image_path || ''%>"
+         style="width:100%; height:100%; object-fit:cover;"/>
+
+    <div class="profile-image">
+        <img id="profileImage"
+             src="<%=profileData.profile_image_path%>"
+             height="100%" width="100%" />
+    </div>
+
+    <button class="edit-btn" onclick="openModal()">Edit Profile</button>
+</div>
+
+<div class="information_container">
+    <div class="fullname">
+        <h1><%=profileData.firstname%> <%=profileData.lastname%></h1>
+        <p>@<%=profileData.username%></p>
+    </div>
+
+    <p>Born <%=profileData.birth_date%></p>
+</div>
+
+<hr>
+
+
+</div>
+
+<!-- ================= MODAL ================= -->
+<div class="modal" id="editModal">
+
+<div class="modal-content">
+
+    <div class="modal-header">
+        <span onclick="closeModal()">✖</span>
+        <button onclick="submitProfile()">Save</button>
+    </div>
+
+    <!-- Cover -->
+    <div class="cover-preview">
+        <img id="coverPreview" style="width:100%; height:100%; object-fit:cover;">
+        
+        <input type="file" id="coverInput" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+        
+        <div class="profile-preview">
+            <img id="profilePreview" width="100%" height="100%">
+            <input type="file" id="profileInput" style="position:absolute;width:100%;height:100%;opacity:0;">
+        </div>
+    </div>
+
+    <div class="modal-body">
+        <input type="text" id="firstName" value="<%=profileData.firstname%>">
+        <input type="text" id="lastName" value="<%=profileData.lastname%>">
+        <textarea id="bio"><%=profileData.bio%></textarea>
+    </div>
+
+</div>
+</div>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+
+// OPEN / CLOSE
+function openModal(){
+    document.getElementById('editModal').style.display='flex';
+}
+function closeModal(){
+    document.getElementById('editModal').style.display='none';
+}
+
+// IMAGE PREVIEW
+document.getElementById('coverInput').addEventListener('change',function(e){
+    const file = e.target.files[0];
+    if(file){
+        const url = URL.createObjectURL(file);
+        document.getElementById('coverPreview').src = url;
+    }
+});
+
+document.getElementById('profileInput').addEventListener('change',function(e){
+    const file = e.target.files[0];
+    if(file){
+        const url = URL.createObjectURL(file);
+        document.getElementById('profilePreview').src = url;
+    }
+});
+
+// SUBMIT
+async function submitProfile(){
+
+    const formData = new FormData();
+
+    formData.append('firstname', document.getElementById('firstName').value);
+    formData.append('lastname', document.getElementById('lastName').value);
+    formData.append('bio', document.getElementById('bio').value);
+
+    formData.append('cover', document.getElementById('coverInput').files[0]);
+    formData.append('profile', document.getElementById('profileInput').files[0]);
+
+    try{
+        const res = await fetch('/api/updateProfile',{
+            method:'POST',
+            body:formData
+        });
+
+        if(res.ok){
+            alert("Updated!");
+            location.reload();
+        }
+    }catch(err){
+        console.log(err);
+    }
+}
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+

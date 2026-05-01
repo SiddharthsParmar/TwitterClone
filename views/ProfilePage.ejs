@@ -1,0 +1,535 @@
+    
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+
+
+
+
+.tweet_upload_container{
+    height: 100vh; 
+    width: 100vw;
+     z-index: 11;
+      background: #0000007d;
+       position: absolute;
+       display: flex;
+        justify-content: center;
+         align-items: center;
+}
+
+.hide_uploader{
+    display: none;
+}
+
+
+</style>
+<body>
+
+
+<div class="main-container" style="  display: flex; justify-content: space-between; flex-direction: column; height: 100vh;background: #000;">
+    <div class="post_tweeet_btn" id="post_tweet_btn" style=" cursor: pointer;height: 50px;width: 50px; background: #00b7ff; position: absolute; z-index: 12;border-radius: 50%; display: flex;justify-content: center; align-items: center; color: white; margin-top: 90vh; margin-left: 90vw;"><h2>+</h2></div>
+   <div class="tweet_upload_container hide_uploader" id="tweet_upload_form_popup">
+    
+<div class="" style="height: 70vh; width: 70vh; background: white; padding: 50px;">
+    <form action="/api/v1/users/uploadtweet" method="post" enctype="multipart/form-data">
+        <input type="submit" style="padding: 5px 20px; margin: 0; background: #000; border: 1px solid grey; color: white;" value="Post">
+        <div class="post_btn" style="color: white;  width: 10; margin-bottom: 50px; text-align:end ;" > <span >post</span></div>
+    
+    <input type="hidden" name="user_id" value="<%=profileData.user_id%>">
+        <textarea cols="50" rows="10" name="tweet_content">
+
+    </textarea>
+    <input type="file" id="imageInput" name="tweet_image" >
+<div class="image_preview_container" style="margin-top: 50px; height: 250px;width: 500px;background: #ffffff; display: flex;justify-content: center; align-items: center;" >
+    <img id="image_preview" width="500"> 
+</div>
+
+
+</form>
+
+
+</div>
+ 
+   </div>
+   
+// cover profiel popup
+<div class="coverprofileform" style="position: absolute; height: 50vh; width: 50vh; background: white; margin-left: 33vw; margin-top: 25vh;">
+
+</div>
+
+
+
+
+
+    <div class="aligner">
+        <a href="/api/v1/users/home">
+        <div class=""  style="position: absolute; height: 50px; width: 50px; display: flex;justify-content: center; align-items: center; background: rgb(255, 255, 255); border-radius: 50%; margin:5px ;" >
+            <img src="https://cdn-icons-png.flaticon.com/128/15767/15767855.png" height="20px" width="20px">
+        </a>
+        </div>
+        <div class="cover_container" onclick="redirectToUploadPage()" style="display: flex; justify-content: flex-start; align-items: flex-end;  background-image: url('/uploads/<%=profileData.cover_image_path%>'); height: 20vh; " >
+            <div class="edit_profile" onclick="coverProfileUploader()" style="cursor: pointer; position: absolute; margin-left: 50vw;color: white; min-width: 150px; min-height: 30px; display: flex; justify-content: center; align-items: center; border: .5px solid grey; border-radius: 50px;">Edit Profile</div>
+            <div class="profile-image" style="border-radius: 50%; border: 5px solid ; height: 75px; overflow: hidden;  background: #ffffff; width: 75px; margin-bottom:-50px ; margin-left: 20px; ">
+
+
+    <img height="75px" width="75px" src="/uploads/<%=profileData.profile_image_path ? profileData.profile_image_path :   'src/uploads/anime-girl-demon-horn-with-glasses-8k-wallpaper-uhdpaper.com-612@0@j.jpg'%>"/>
+
+
+
+            
+            </div>
+        </div>
+
+        <div class="information_container" style="color: rgb(153, 153, 153); height: 30vh; background: rgb(0, 0, 0); padding: 30px 10px;">
+            <div class="fullname"><h1><%=profileData.firstname%> <%=profileData.lastname%> </h1>
+            <p>@<%=profileData.username%></p>
+            </div>
+            <div class="fullname">
+          <span>
+                
+                
+               <span id="followerCount">0</span> <a href="/api/v1/users/followers" style="color:white">followings</a> 
+            
+            <span id="followingCount">0</span> <a href="/api/v1/users/following" style="color:white">followers</a> 
+            </div>
+            
+        </div>  
+        <hr>
+
+<!-- ================= TWEETS ================= -->
+<div class="tweet_container" style="display:flex; background: #000; overflow-y: scroll; justify-content:center; height: 50vh;">
+<div style="width:100%; max-width:500px; ">
+
+<% data.forEach((tweet) => { %>
+
+<div class="single_tweet" style="border:1px solid #333; margin:10px; padding:10px;">
+
+    <div style="display:flex; gap:10px;">
+        <img src="<%=profileData.profile_image_path%>" height="40" width="40" style="border-radius:50%">
+    </div>
+    <p style="color:white;">
+<%=profileData.firstname%> @<%=profileData.username%> 
+<span class="tweet-time" data-time="<%=tweet.created_at%>" style="color:#888; font-size:12px;"></span>
+</p>
+
+    <% if (tweet.tweet_media) { %>
+        <video width="100px" autoplay>
+            <source src="/uploads/<%= tweet.tweet_media %>" type="video/mp4">
+        </video>
+    <img src="/uploads/<%= tweet.tweet_media %>" style="width:100%; margin-top:10px;">
+    <% } %>
+
+    <p style="color:white;"><%=tweet.tweet_content%></p>
+
+</div>
+
+<!-- CONTROLS WITH DATA ATTRIBUTES --> 
+ <div class="tweet_controls" style="display: flex; justify-content: space-around; align-items: center; margin-top: 10px; position: relative;"> <!-- Like Button --> <!-- Pass current user ID and tweet ID as data attributes --> <button class="icon-btn like-btn" style="background: none; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; color: #888;" data-tweet-id="<%=tweet.tweet_original_id%>" data-user-id="<%=profileData.user_id %>"> 
+    <span style="font-size: 20px;">❤️</span> 
+    <span class="like-count" style="font-size: 12px; margin-top: 2px;">0</span> 
+</button> <!-- Comment Button (Triggers comment section) --> 
+<button class="icon-btn comment-btn" style="background: none; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; color: #888;" data-tweet-id="<%=tweet.tweet_original_id%>">
+     <span style="font-size: 20px;">💬</span> <span style="font-size: 12px; margin-top: 2px;">Comment</span> 
+    </button> <!-- Retweet Button -->
+     <button class="icon-btn retweet-btn" style="background: none; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; color: #888;" data-tweet-id="<%=tweet.tweet_original_id%>" data-user-id="<%=profileData.user_id %>"> 
+        <span style="font-size: 20px;">🔄</span> <span style="font-size: 12px; margin-top: 2px;">Retweet</span> 
+    </button> 
+<button class="icon-btn delete-btn" style="background: none; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; color: #888;" data-tweet-id="<%=tweet.tweet_original_id%>" data-user-id="<%=profileData.user_id %>"> 
+        <span style="font-size: 20px;">⃠</span> <span style="font-size: 12px; margin-top: 2px;">Delete</span> 
+    </button>
+
+</div>
+
+<!-- HIDDEN COMMENTS SECTION (Initially hidden) -->
+     <div class="comments-section" style="display: none; width: 100%; background: #111; padding: 10px; margin-top: 10px; border-radius: 8px;">
+         <p style="color: #888; font-size: 12px;">Comments for this tweet...</p> 
+         <input type="text" placeholder="Write a comment..." style="width: 80%; padding: 5px; background: #333; border: none; color: white; border-radius: 4px;">
+          <button style="padding: 5px 10px; background: #1d9bf0; color: white; border: none; border-radius: 4px; cursor: pointer;">Post</button> 
+        </div>
+    
+    
+
+
+
+
+
+
+
+
+<% }); %>
+
+</div>
+</div>
+
+
+
+
+
+
+
+
+     
+
+
+
+
+        </div>
+
+    </div>
+
+
+
+   </div>
+<script>
+    // Wait for DOM to load
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        // --- 1. LIKE FUNCTIONALITY ---
+        document.querySelectorAll('.like-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const tweetId = this.getAttribute('data-tweet-id');
+                const userId = this.getAttribute('data-user-id');
+                const icon = this.querySelector('span:first-child');
+                const countSpan = this.querySelector('.like-count');
+                
+                // Optimistic UI update (turn red immediately)
+                const isLiked = icon.style.color === 'red';
+                
+                if (!isLiked) {
+                    icon.style.color = 'red';
+                    // Increment local count
+                    let currentCount = parseInt(countSpan.innerText);
+                    countSpan.innerText = currentCount + 1;
+                } else {
+                    icon.style.color = '#888';
+                    let currentCount = parseInt(countSpan.innerText);
+                    countSpan.innerText = currentCount - 1;
+                }
+
+                // Send API Request
+                try {
+                    const response = await fetch('http://localhost:8080/api/v1/users/like', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tweetId, userId })
+                    });
+
+                    if (!response.ok) {
+                        // Revert UI if API fails
+                        throw new Error('API Error');
+                    }
+                    const result = await response.json();
+                    // Update count with actual server count if needed
+                    // countSpan.innerText = result.count; 
+                } catch (error) {
+                    console.error('Like failed:', error);
+                    // Revert UI on error
+                    icon.style.color = isLiked ? 'red' : '#888';
+                }
+            });
+        });
+
+        // --- 2. COMMENT FUNCTIONALITY (Extend Div) ---
+        document.querySelectorAll('.comment-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tweetId = this.getAttribute('data-tweet-id');
+                // Find the sibling comments-section div
+                const commentsDiv = this.closest('.single_tweet').querySelector('.comments-section');
+                
+                if (commentsDiv.style.display === 'none' || commentsDiv.style.display === '') {
+                    commentsDiv.style.display = 'block';
+                    // Optional: Scroll into view
+                    commentsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    commentsDiv.style.display = 'none';
+                }
+            });
+        });
+
+        // --- 3. RETWEET FUNCTIONALITY ---
+        document.querySelectorAll('.retweet-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const tweetId = this.getAttribute('data-tweet-id');
+                const userId = this.getAttribute('data-user-id');
+                const icon = this.querySelector('span:first-child');
+
+                // Visual feedback
+                const originalText = icon.innerText;
+                icon.innerText = '⏳'; // Loading state
+
+                try {
+                    const response = await fetch('/api/tweets/retweet', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tweetId, userId })
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            icon.innerText = '✅'; // Success state
+                            setTimeout(() => icon.innerText = originalText, 2000);
+                            alert('Retweeted successfully!');
+                        }
+                    } else {
+                        const errorData = await response.json();
+                        alert('Retweet failed: ' + (errorData.message || 'Unknown error'));
+                        icon.innerText = originalText;
+                    }
+                } catch (error) {
+                    console.error('Retweet error:', error);
+                    alert('Network error. Please try again.');
+                    icon.innerText = originalText;
+                     
+                }
+            });
+        });
+       document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", async function () {
+        const tweetId = this.getAttribute("data-tweet-id");
+        const userId = this.getAttribute("data-user-id");
+        const icon = this.querySelector('span:first-child');
+        const originalText = icon.innerText;
+
+        // Set loading state
+        icon.innerText = "⏳";
+
+        try {
+            // FIX 1: Await the fetch call here
+            const response = await fetch("/api/v1/users/delete", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tweetId, userId })
+            });
+
+            // FIX 2: Now 'response' is the actual object, so .ok works
+            if (response.ok) {
+                const result = await response.json();
+                
+                if (result.success) {
+                    icon.innerText = '✅';
+                    // FIX 3: Corrected the alert message
+                    alert('Tweet deleted successfully!'); 
+                    
+                    // Optional: Remove the element from DOM instead of just showing an alert
+                    // this.closest('.tweet-container').remove(); 
+                    
+                    setTimeout(() => icon.innerText = originalText, 2000);
+                } else {
+                    // Handle server-side failure (e.g., not authorized)
+                    alert('Delete failed: ' + (result.message || 'Unknown error'));
+                    icon.innerText = originalText;
+                }
+            } else {
+                // Handle HTTP errors (4xx, 5xx)
+                let errorData = {};
+                try {
+                    errorData = await response.json();
+                } catch (e) {
+                    // Fallback if server returns non-JSON error
+                    errorData = { message: "Server returned an error" };
+                }
+                alert('Delete failed: ' + (errorData.message || 'Unknown error'));
+                icon.innerText = originalText;
+            }
+
+        } catch (error) {
+            // This catches network failures (no internet, server down, CORS)
+            console.error('Delete error:', error);
+            alert('Network error. Please try again.');
+            icon.innerText = originalText;
+        }
+    });
+});
+    });
+
+
+const getFollowerCount = async()=>{
+
+const followerCount = document.getElementById("followerCount")
+const followingCount = document.getElementById("followingCount")
+    const followers = await fetch("http://localhost:8080/api/v1/users/followers");
+    const followings = await fetch("http://localhost:8080/api/v1/users/following")
+if(followers.status==200){
+
+    const data =await followers.json();
+    console.log(data);
+followerCount.textContent = data.followerCount;
+
+}if(followings.status==200){
+
+    const data =await followings.json();
+    console.log(data);
+followingCount.textContent = data.followingCount;
+
+}
+}
+getFollowerCount()
+
+
+function timeAgo(dateString){
+
+    // Convert MySQL format → ISO (important)
+    const utcDate = new Date(dateString.replace(' ', 'T') + 'Z');
+    const now = new Date();
+
+    const diffMs = now - utcDate;
+
+    const seconds = Math.floor(diffMs / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if(hours < 1){
+        return `${minutes} min ago`;
+    }else if(hours < 24){
+        return `${hours} hr ago`;
+    }else{
+        return `${days} day ago`;
+    }
+}
+
+document.querySelectorAll('.tweet-time').forEach(el=>{
+    const time = el.getAttribute('data-time');
+    el.innerText = " • " + timeAgo(time);
+});
+
+
+
+
+
+const post_tweet_btn = document.getElementById("post_tweet_btn");
+post_tweet_btn.addEventListener("click",()=>{
+
+
+})
+
+
+const coverProfileUploader = ()=>{
+
+
+
+    
+}
+
+
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script>
+
+
+
+
+
+
+    // const redirectToUploadPage = ()=>{
+    //     alert("hello")
+    //     window.location.href = "http://localhost:8080/api/v1/users/update_profile"
+    // }
+ const fetchTweets =async()=>{
+
+    const response = await fetch("http://localhost:8080/api/v1/users/fetchtweets",{
+        method:'get'
+    })
+    // if(response.status == 200){
+    //     alert("data got")
+    // }
+    
+   const data = await response.json()
+    console.log(data);
+    
+    const tweet_card =document.getElementById("single_tweet")
+    // tweet_card.innerHTML = `
+    //                 <div class="user_data">
+    //                       <h2 style="color: white;">  <%=profileData.username%></h2>
+
+    //                     </div>
+    //                     <div class="tweet_data" style="color:white">
+    //                         <img src=${data.data[0].tweet_media} height="50px" width="50px" />
+    //                         ${data.data[0].tweet_content}
+    //                     </div>
+    //                     <div class="tweet_controls">
+
+    //                     </div>
+
+    //                 </div>`
+
+
+
+
+    }
+     fetchTweets()
+
+
+
+    </script> 
+
+
+
+
+<script>
+// post container toggler
+const post_tweeet_btn =  document.getElementById("post_tweet_btn");
+const tweet_upload_form_popup = document.getElementById("tweet_upload_form_popup")
+    
+    
+    post_tweeet_btn.addEventListener("click",(e)=>{
+        e.preventDefault()
+        console.log("done");
+        
+    tweet_upload_form_popup.classList.toggle ("hide_uploader")
+
+
+
+
+
+    
+})
+
+
+
+
+
+
+
+const imageInput  = document.getElementById("imageInput");
+const preview = document.getElementById("image_preview");
+imageInput.addEventListener("change",function(e){
+
+const file = this.files[0];
+if(file){
+    const imageUrl = URL.createObjectURL(file);
+    console.log(imageUrl);
+    
+    preview.src = imageUrl;
+}
+
+
+})
+
+</script>
+    
+</body>
+<!-- </html>
+refere this ejs frontend page  , this is like profile page of the twitter/x , add edit  profile button which opens the pop up with the upload functionality form of the cover imahe and profile image ,also when user uploads them it should show into frontend first before submiting the data , with bio and (uploaded image is popup for the refence) logic and other thing in profile page remain same , no code should be trimmed , just make necessary changes and to make it more structured , responsive for the mobile also add css into <style> tag ,  -->

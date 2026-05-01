@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="main-container" style=" display: flex; justify-content: space-between; flex-direction: column; height: 100vh;background: #000;">
+
+
+ <div class="aligner">
+<div class="cover_container"  style="display: flex; justify-content: flex-start; align-items: flex-end; background: url('/uploads/<%=profileData[0].cover_image_path%>'); height: 20vh; " >
+            <div class="profile-image" style="border-radius: 50%; border: 5px solid ; height: 75px; overflow: hidden;  background: #ffffff; width: 75px; margin-bottom:-50px ; margin-left: 20px; ">
+               
+<img height="75px" width="75px" src="/uploads/<%=profileData[0].profile_image_path %>"/>  
+
+
+
+            
+            </div>
+        </div>
+          <div class="information_container" style="color: rgb(153, 153, 153); height: 30vh; background: rgb(0, 0, 0); padding: 30px 10px;">
+            <div class="fullname"><h1><%=profileData[0].firstname%> <%=profileData[0].lastname%> </h1>
+            <p>@<%=profileData[0].username%></p>
+            </div>
+            <div class="fullname">
+            <p>Born <%=(profileData[0].birth_date)%>
+            Joined March 2025 </p>
+            <p><span>5 Following </span><span>0 Followers</span></p>
+
+                <form action="/api/v1/users/follow" method="POST">
+                    <input type="hidden" name="followee_id"
+                    value="<%=profileData[0].user_id%>"
+                    
+                    >
+                    <input type="submit" value="follow" style="padding: 10px 70px; background: white; color: black; border-radius: 50px;">
+                </form>
+                <form action="/api/v1/users/follow" method="POST">
+                    <input type="hidden" name="followee_id"
+                    value="<%=profileData[0].user_id%>"
+                    
+                    >
+                    <input type="submit" value="Unfollow" style="padding: 10px 70px; background: rgba(255, 255, 255, 0); color: rgb(255, 255, 255); border-radius: 50px; border: .5px solid grey;">
+                </form>
+
+
+            </div>
+             <div class="tweet_container" style="background: rgb(0, 0, 0) ; height: 80vh; display: flex; justify-content: center; align-items: center;">
+            <div class="aligner" style="background: rgb(0, 0, 0); overflow-y: scroll; width: 50vw; height: 50vh; display: flex; flex-direction: column; align-items: center; justify-content: space-between; ">
+                <div class="tweets_container" style=" overflow-y: scroll; width: 50vw; height: 7            0vh; display: flex; flex-direction: column; align-items: center; justify-content: space-between;" >
+                    
+             <% tweet.forEach((tweet) => { %>
+<div class="single_tweet" style="height: auto; width: 25em; background: #000; margin: 5px; border: 1px solid #333;">
+    <!-- User Data (Same as before) -->
+    <div class="user_data" style="display: flex; height: 50px; color: white; gap: 5px;">
+        <div class="profile_image" style="height: 50px; width: 50px; background: white; border-radius: 50%; overflow: hidden;">
+            <img src="/uploads/<%=profileData[0].profile_image_path%>" height="50px" width="50px" style="border-radius: 50%; object-fit: cover;"/>
+        </div>
+        <div class="user_info" style="display: flex; justify-content: start; align-items: center;">
+            <p style="margin:0;"><%=profileData[0].firstname%> <span style="color: #888;">@<%=profileData[0].username%></span></p>
+        </div>
+    </div>
+
+    <div class="tweet_data" style="color:white; display: flex; align-items: center; justify-content: center; flex-direction: column; margin-top: 10px;">
+        <% if (tweet.tweet_media) { %>
+            <div style="height: 12rem; width: 20rem; background: rgb(75, 75, 75); border-radius: 10px; overflow: hidden; margin-bottom: 10px;">
+                <img src="/uploads/<%= tweet.tweet_media %>" height="100%" width="100%" style="object-fit: cover;"/>
+            </div>
+        <% } %>
+        
+        <p style="margin: 10px 0;"><%=tweet.tweet_content%></p>
+        <h1><%=tweet.tweet_original_id%></h1>
+    </div>
+
+    <!-- CONTROLS WITH DATA ATTRIBUTES -->
+    <div class="tweet_controls" style="display: flex; justify-content: space-around; align-items: center; margin-top: 10px; position: relative;">
+        
+        <!-- Like Button -->
+        <!-- Pass current user ID and tweet ID as data attributes -->
+        <button class="icon-btn like-btn" 
+                style="background: none; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; color: #888;"
+                data-tweet-id="<%=tweet.tweet_original_id%>" 
+                data-user-id="<%=profileData.user_id %>"> 
+            <span style="font-size: 20px;">❤️</span>
+            <span class="like-count" style="font-size: 12px; margin-top: 2px;">0</span>
+        </button>
+
+        <!-- Comment Button (Triggers comment section) -->
+        <button class="icon-btn comment-btn" 
+                style="background: none; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; color: #888;"
+                data-tweet-id="<%=tweet.tweet_original_id%>">
+            <span style="font-size: 20px;">💬</span>
+            <span style="font-size: 12px; margin-top: 2px;">Comment</span>
+        </button>
+
+        <!-- Retweet Button -->
+        <button class="icon-btn retweet-btn" 
+                style="background: none; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; color: #888;"
+                data-tweet-id="<%=tweet.tweet_original_id%>"
+                data-user-id="<%=profileData.user_id %>">
+            <span style="font-size: 20px;">🔄</span>
+            <span style="font-size: 12px; margin-top: 2px;">Retweet</span>
+        </button>
+    </div>
+
+    <!-- HIDDEN COMMENTS SECTION (Initially hidden) -->
+    <div class="comments-section" style="display: none; width: 100%; background: #111; padding: 10px; margin-top: 10px; border-radius: 8px;">
+        <p style="color: #888; font-size: 12px;">Comments for this tweet...</p>
+        <input type="text" placeholder="Write a comment..." style="width: 80%; padding: 5px; background: #333; border: none; color: white; border-radius: 4px;">
+        <button style="padding: 5px 10px; background: #1d9bf0; color: white; border: none; border-radius: 4px; cursor: pointer;">Post</button>
+    </div>
+</div>
+
+<% }); %>
+</div>
+</div>
+</div>
+
+                    
+                
+
+                    </div>
+                    
+
+
+
+
+
+
+                </div>
+              
+            </div>
+        </div>  
+
+
+ </div>
+</div>
+
+<script>
+    // Wait for DOM to load
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        // --- 1. LIKE FUNCTIONALITY ---
+        document.querySelectorAll('.like-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const tweetId = this.getAttribute('data-tweet-id');
+                const userId = this.getAttribute('data-user-id');
+                const icon = this.querySelector('span:first-child');
+                const countSpan = this.querySelector('.like-count');
+                
+                // Optimistic UI update (turn red immediately)
+                const isLiked = icon.style.color === 'red';
+                
+                if (!isLiked) {
+                    icon.style.color = 'red';
+                    // Increment local count
+                    let currentCount = parseInt(countSpan.innerText);
+                    countSpan.innerText = currentCount + 1;
+                } else {
+                    icon.style.color = '#888';
+                    let currentCount = parseInt(countSpan.innerText);
+                    countSpan.innerText = currentCount - 1;
+                }
+
+                // Send API Request
+                try {
+                    const response = await fetch('http://localhost:8080/api/v1/users/like', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tweetId, userId })
+                    });
+
+                    if (!response.ok) {
+                        // Revert UI if API fails
+                        throw new Error('API Error');
+                    }
+                    const result = await response.json();
+                    // Update count with actual server count if needed
+                    // countSpan.innerText = result.count; 
+                } catch (error) {
+                    console.error('Like failed:', error);
+                    // Revert UI on error
+                    icon.style.color = isLiked ? 'red' : '#888';
+                }
+            });
+        });
+
+        // --- 2. COMMENT FUNCTIONALITY (Extend Div) ---
+        document.querySelectorAll('.comment-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tweetId = this.getAttribute('data-tweet-id');
+                // Find the sibling comments-section div
+                const commentsDiv = this.closest('.single_tweet').querySelector('.comments-section');
+                
+                if (commentsDiv.style.display === 'none' || commentsDiv.style.display === '') {
+                    commentsDiv.style.display = 'block';
+                    // Optional: Scroll into view
+                    commentsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    commentsDiv.style.display = 'none';
+                }
+            });
+        });
+
+        // --- 3. RETWEET FUNCTIONALITY ---
+        document.querySelectorAll('.retweet-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const tweetId = this.getAttribute('data-tweet-id');
+                const userId = this.getAttribute('data-user-id');
+                const icon = this.querySelector('span:first-child');
+
+                // Visual feedback
+                const originalText = icon.innerText;
+                icon.innerText = '⏳'; // Loading state
+
+                try {
+                    const response = await fetch('/api/tweets/retweet', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tweetId, userId })
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            icon.innerText = '✅'; // Success state
+                            setTimeout(() => icon.innerText = originalText, 2000);
+                            alert('Retweeted successfully!');
+                        }
+                    } else {
+                        const errorData = await response.json();
+                        alert('Retweet failed: ' + (errorData.message || 'Unknown error'));
+                        icon.innerText = originalText;
+                    }
+                } catch (error) {
+                    console.error('Retweet error:', error);
+                    alert('Network error. Please try again.');
+                    icon.innerText = originalText;
+                }
+            });
+        });
+    });
+
+
+const fetchTweets =async()=>{
+
+    const response = await fetch("http://localhost:8080/api/v1/users/fetchtweets",{
+        method:'get'
+    })
+    // if(response.status == 200){
+    //     alert("data got")
+    // }
+    
+   const data = await response.json()
+    console.log(data);
+    
+    const tweet_card =document.getElementById("single_tweet")
+    // tweet_card.innerHTML = `
+    //                 <div class="user_data">
+    //                       <h2 style="color: white;">  <%=profileData.username%></h2>
+
+    //                     </div>
+    //                     <div class="tweet_data" style="color:white">
+    //                         <img src=${data.data[0].tweet_media} height="50px" width="50px" />
+    //                         ${data.data[0].tweet_content}
+    //                     </div>
+    //                     <div class="tweet_controls">
+
+    //                     </div>
+
+    //                 </div>`
+
+
+
+
+    }
+     fetchTweets()
+
+
+
+     // follow unfollow togglers
+
+    //  approach: fetch for userid and singleuser id if record exist render Unfollow and if not then render follow
+
+    const isFollowing=async()=>{
+
+    
+       
+    }
+
+// isFollowing()
+
+
+
+</script>
+
+
+
+
+</body>
+</html>
